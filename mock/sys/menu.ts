@@ -90,50 +90,7 @@ const levelRoute = {
     title: 'routes.demo.level.level',
   },
 
-  children: [
-    {
-      path: 'menu1',
-      name: 'Menu1Demo',
-      meta: {
-        title: 'Menu1',
-      },
-      children: [
-        {
-          path: 'menu1-1',
-          name: 'Menu11Demo',
-          meta: {
-            title: 'Menu1-1',
-          },
-          children: [
-            {
-              path: 'menu1-1-1',
-              name: 'Menu111Demo',
-              component: '/demo/level/Menu111',
-              meta: {
-                title: 'Menu111',
-              },
-            },
-          ],
-        },
-        {
-          path: 'menu1-2',
-          name: 'Menu12Demo',
-          component: '/demo/level/Menu12',
-          meta: {
-            title: 'Menu1-2',
-          },
-        },
-      ],
-    },
-    {
-      path: 'menu2',
-      name: 'Menu2Demo',
-      component: '/demo/level/Menu2',
-      meta: {
-        title: 'Menu2',
-      },
-    },
-  ],
+  children: [],
 };
 
 const sysRoute = {
@@ -145,66 +102,7 @@ const sysRoute = {
     icon: 'ion:settings-outline',
     title: 'routes.demo.system.moduleName',
   },
-  children: [
-    {
-      path: 'account',
-      name: 'AccountManagement',
-      meta: {
-        title: 'routes.demo.system.account',
-        ignoreKeepAlive: true,
-      },
-      component: '/demo/system/account/index',
-    },
-    {
-      path: 'account_detail/:id',
-      name: 'AccountDetail',
-      meta: {
-        hideMenu: true,
-        title: 'routes.demo.system.account_detail',
-        ignoreKeepAlive: true,
-        showMenu: false,
-        currentActiveMenu: '/system/account',
-      },
-      component: '/demo/system/account/AccountDetail',
-    },
-    {
-      path: 'role',
-      name: 'RoleManagement',
-      meta: {
-        title: 'routes.demo.system.role',
-        ignoreKeepAlive: true,
-      },
-      component: '/demo/system/role/index',
-    },
-
-    {
-      path: 'menu',
-      name: 'MenuManagement',
-      meta: {
-        title: 'routes.demo.system.menu',
-        ignoreKeepAlive: true,
-      },
-      component: '/demo/system/menu/index',
-    },
-    {
-      path: 'dept',
-      name: 'DeptManagement',
-      meta: {
-        title: 'routes.demo.system.dept',
-        ignoreKeepAlive: true,
-      },
-      component: '/demo/system/dept/index',
-    },
-    {
-      path: 'changePassword',
-      name: 'ChangePassword',
-      meta: {
-        title: 'routes.demo.system.password',
-        ignoreKeepAlive: true,
-      },
-      component: '/demo/system/password/index',
-    },
-  ],
+  children: [],
 };
 
 const linkRoute = {
