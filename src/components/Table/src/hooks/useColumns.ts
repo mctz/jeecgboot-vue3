@@ -151,13 +151,11 @@ export function useColumns(
         return hasPermission(column.auth) && isIfShow(column);
       })
       .map((column) => {
-        // update-begin--author:liaozhiyang---date:20230718---for: 【issues-179】antd3 一些警告以及报错(针对表格)
         if(column.slots?.customRender) {
           // slots的备份，兼容老的写法，转成新写法避免控制台警告
           column.slotsBak = column.slots;
           delete column.slots;
         }
-        // update-end--author:liaozhiyang---date:20230718---for: 【issues-179】antd3 一些警告以及报错(针对表格)
 
         const { slots, customRender, format, edit, editRow, flag, title: metaTitle } = column;
 
@@ -166,11 +164,9 @@ export function useColumns(
           column.customTitle = column.title as string;
           Reflect.deleteProperty(column, 'title');
         }
-        //update-begin-author:taoyan date:20211203 for:【online报表】分组标题显示错误，都显示成了联系信息 LOWCOD-2343
         if (column.children) {
           column.title = metaTitle;
         }
-        //update-end-author:taoyan date:20211203 for:【online报表】分组标题显示错误，都显示成了联系信息 LOWCOD-2343
 
         const isDefaultAction = [INDEX_COLUMN_FLAG, ACTION_COLUMN_FLAG].includes(flag!);
         if (!customRender && format && !edit && !isDefaultAction) {

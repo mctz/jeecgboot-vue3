@@ -154,8 +154,8 @@ export const table = {
   ],
   ipagination: {
     current: 1,
-    pageSize: 5,
-    pageSizeOptions: ['10', '20', '30'],
+    pageSize: 10,
+    pageSizeOptions: ['10', '50', '100'],
     showTotal: (total, range) => {
       return range[0] + '-' + range[1] + ' 共' + total + '条';
     },
@@ -207,8 +207,8 @@ export const table1 = {
   ],
   ipagination: {
     current: 1,
-    pageSize: 5,
-    pageSizeOptions: ['10', '20', '30'],
+    pageSize: 10,
+    pageSizeOptions: ['10', '50', '100'],
     showTotal: (total, range) => {
       return range[0] + '-' + range[1] + ' 共' + total + '条';
     },
