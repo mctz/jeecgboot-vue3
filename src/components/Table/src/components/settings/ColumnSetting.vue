@@ -16,7 +16,9 @@
           <Checkbox :indeterminate="indeterminate" v-model:checked="checkAll" @change="onCheckAllChange">
             {{ t('component.table.settingColumnShow') }}
           </Checkbox>
-
+          <label>
+            {{ t('component.table.settingColumnWidth') }}
+          </label>
           <Checkbox v-model:checked="checkIndex" @change="handleIndexCheckChange">
             {{ t('component.table.settingIndexColumnShow') }}
           </Checkbox>
@@ -37,10 +39,10 @@
             <template v-for="item in plainOptions" :key="item.value">
               <div :class="`${prefixCls}__check-item`" v-if="!('ifShow' in item && !item.ifShow)">
                 <DragOutlined class="table-column-drag-icon" />
-                <Checkbox :value="item.value">
+                <Checkbox :value="item.value" style="width: 120px">
                   {{ item.label }}
                 </Checkbox>
-
+                <a-input-number v-bind="item.width" v-model:value="item.width" style="width: 70px;margin-right: 30px" />
                 <Tooltip placement="bottomLeft" :mouseLeaveDelay="0.4" :getPopupContainer="getPopupContainer">
                   <template #title>
                     {{ t('component.table.settingFixedLeft') }}
@@ -116,6 +118,7 @@
   }
 
   interface Options {
+    width?: number | string;
     label: string;
     value: string;
     fixed?: boolean | 'left' | 'right';
@@ -168,6 +171,15 @@
       const { prefixCls } = useDesign('basic-column-setting');
 
       const getValues = computed(() => {
+        const columns1 = plainOptions.value;
+        const columns2 = table?.getBindValues.value.columns;
+        for (const c1 of columns1) {
+          for (const c2 of columns2) {
+            if (c1.key == c2.key && c1.width) {
+              c2.width = c1.width;
+            }
+          }
+        }
         return unref(table?.getBindValues) || {};
       });
 
@@ -225,7 +237,6 @@
 
       function init() {
         const columns = getColumns();
-
         const checkList = table
           .getColumns({ ignoreAction: true })
           .map((item) => {
@@ -382,7 +393,6 @@
           columns[index].fixed = isFixed;
         }
         item.fixed = isFixed;
-
         if (isFixed && !item.width) {
           item.width = 100;
         }

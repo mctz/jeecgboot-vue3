@@ -421,7 +421,7 @@ export interface BasicColumn extends ColumnProps<Recordable> {
     value: string;
     children?: unknown[] | (((props: Record<string, unknown>) => unknown[]) & (() => unknown[]) & (() => unknown[]));
   }[];
-
+  width?: number | string;
   //
   flag?: 'INDEX' | 'DEFAULT' | 'CHECKBOX' | 'RADIO' | 'ACTION';
   customTitle?: VueNode;

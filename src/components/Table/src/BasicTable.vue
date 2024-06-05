@@ -9,6 +9,7 @@
       @submit="handleSearchInfoChange"
       @advanced-change="redoHeight"
     >
+      <!-- getFormSlotKeys -->
       <template #[replaceFormSlotKey(item)]="data" v-for="item in getFormSlotKeys">
         <slot :name="item" v-bind="data || {}"></slot>
       </template>
@@ -19,21 +20,19 @@
     <a-form-item-rest>
       <Table ref="tableElRef" v-bind="getBindValues" :rowClassName="getRowClassName" v-show="getEmptyDataIsShowTable" @resizeColumn="handleResizeColumn" @change="handleTableChange">
         <!-- antd的原生插槽直接传递 -->
+        <!-- slotNamesGroup.native -->
         <template #[item]="data" v-for="item in slotNamesGroup.native" :key="item">
           <slot :name="item" v-bind="data || {}"></slot>
         </template>
         <template #headerCell="{ column }">
-          <!-- update-begin--author:sunjianlei---date:220230630---for：【QQYUN-5571】自封装选择列，解决数据行选择卡顿问题 -->
+          <!-- CustomSelectHeader HeaderCell -->
           <CustomSelectHeader v-if="isCustomSelection(column)" v-bind="selectHeaderProps"/>
           <HeaderCell v-else :column="column" />
-          <!-- update-end--author:sunjianlei---date:220230630---for：【QQYUN-5571】自封装选择列，解决数据行选择卡顿问题 -->
         </template>
         <!-- 增加对antdv3.x兼容 -->
         <template #bodyCell="data">
-          <!-- update-begin--author:liaozhiyang---date:220230717---for：【issues-179】antd3 一些警告以及报错(针对表格) -->
-          <!-- update-begin--author:liusq---date:20230921---for：【issues/770】slotsBak异常报错的问题,增加判断column是否存在 -->
+          <!-- customRender bodyCell -->
           <template v-if="data.column?.slotsBak?.customRender">
-          <!-- update-end--author:liusq---date:20230921---for：【issues/770】slotsBak异常报错的问题,增加判断column是否存在 -->
             <slot :name="data.column.slotsBak.customRender" v-bind="data || {}"></slot>
           </template>
           <template v-else>
