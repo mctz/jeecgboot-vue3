@@ -22,14 +22,6 @@
           <Checkbox v-model:checked="checkIndex" @change="handleIndexCheckChange">
             {{ t('component.table.settingIndexColumnShow') }}
           </Checkbox>
-
-          <!--                    <Checkbox-->
-          <!--                            v-model:checked="checkSelect"-->
-          <!--                            @change="handleSelectCheckChange"-->
-          <!--                            :disabled="!defaultRowSelection"-->
-          <!--                    >-->
-          <!--                        {{ t('component.table.settingSelectColumnShow') }}-->
-          <!--                    </Checkbox>-->
         </div>
       </template>
 
@@ -42,7 +34,7 @@
                 <Checkbox :value="item.value" style="width: 120px">
                   {{ item.label }}
                 </Checkbox>
-                <a-input-number v-bind="item.width" v-model:value="item.width" style="width: 70px;margin-right: 30px" />
+                <a-input-number v-bind="item.width" v-model:value="item.width" style="margin-right: 30px" min="50" max="400" step="10" placeholder="width" :title="item.label" />
                 <Tooltip placement="bottomLeft" :mouseLeaveDelay="0.4" :getPopupContainer="getPopupContainer">
                   <template #title>
                     {{ t('component.table.settingFixedLeft') }}
@@ -109,6 +101,7 @@
   import { cloneDeep, omit } from 'lodash-es';
   import Sortablejs from 'sortablejs';
   import type Sortable from 'sortablejs';
+  import { defHttp } from "@/utils/http/axios";
 
   interface State {
     checkAll: boolean;
@@ -175,11 +168,10 @@
         const columns2 = table?.getBindValues.value.columns;
         for (const c1 of columns1) {
           for (const c2 of columns2) {
-            if (c1.key == c2.key && c1.width) {
-              c2.width = c1.width;
-            }
+            if (c1.key == c2.key && c1.width) c2.width = c1.width;
           }
         }
+        console.debug("getValues",columns2);
         return unref(table?.getBindValues) || {};
       });
 
@@ -236,6 +228,7 @@
       }
 
       function init() {
+        console.debug('init()');
         const columns = getColumns();
         const checkList = table
           .getColumns({ ignoreAction: true })
@@ -252,6 +245,7 @@
           plainSortOptions.value = columns;
           cachePlainOptions.value = columns;
           state.defaultCheckList = checkList;
+          loadCgformFieldList();
         } else {
           // const fixedColumns = columns.filter((item) =>
           //   Reflect.has(item, 'fixed')
@@ -266,6 +260,25 @@
         }
         state.isInit = true;
         state.checkedList = checkList;
+      }
+
+      async function loadCgformFieldList() {
+        console.debug('loadCgformFieldList()');
+        const path = window.location.pathname;
+        const params = {
+          headId: path.slice(path.lastIndexOf('/') + 1),
+        };
+        const res = await defHttp.get({ url: `/onilne/cgformFieldList`, params });
+        if (res.data) {
+          const columns1 = plainOptions.value;
+          let arr = res.data;
+          for (const c1 of columns1) {
+            for (const c2 of arr) {
+              if (c1.key == c2.db_field_name && c2.field_length) c1.width = c2.field_length;
+            }
+          }
+          console.debug(columns1);
+        }
       }
 
       // checkAll change
@@ -300,6 +313,7 @@
 
       // reset columns
       function reset() {
+        console.debug('reset()');
         // state.checkedList = [...state.defaultCheckList];
         // update-begin--author:liaozhiyang---date:20231103---for：【issues/825】tabel的列设置隐藏列保存后切换路由问题[重置没勾选]
         state.checkedList = table
@@ -316,6 +330,7 @@
         if (sortableOrder.value) {
           sortable.sort(sortableOrder.value);
         }
+        loadCgformFieldList();
         resetSetting();
       }
 

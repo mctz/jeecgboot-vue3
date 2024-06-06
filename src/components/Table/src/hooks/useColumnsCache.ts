@@ -105,9 +105,7 @@ export function useColumnsCache(opt, setColumns, handleColumnFixed) {
     const columns2 = table?.getBindValues.value.columns;
     for (const c1 of columns1) {
       for (const c2 of columns2) {
-        if (c1.key == c2.key && c1.width) {
-          c2.width = c1.width;
-        }
+        if (c1.key == c2.key && c1.width) c2.width = c1.width;
       }
     }
     $ls.set(cacheKey.value, {
@@ -131,10 +129,6 @@ export function useColumnsCache(opt, setColumns, handleColumnFixed) {
 
   /** 重置（删除）列配置 */
   async function resetSetting() {
-    const columns1 = opt.plainOptions.value;
-    for (const c1 of columns1) {
-      c1.width = '';
-    }
     // 重置固定列
     await resetFixedColumn();
     $ls.remove(cacheKey.value);
