@@ -110,7 +110,7 @@ export function useCustomSelection(
   });
   // 当前页条目数量
   const currentPageSize = computed(() => {
-    const { pageSize = 10, total = flattedData.value.length } = getPagination.value;
+    const { pageSize = 20, total = flattedData.value.length } = getPagination.value;
     return pageSize > total ? total : pageSize;
   });
 

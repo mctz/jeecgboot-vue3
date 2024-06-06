@@ -214,7 +214,7 @@
         const url = '/sys/user/selectUserList';
         let params = {
           pageNo: pageNo.value,
-          pageSize: 10,
+          pageSize: 20,
         };
         if (searchText.value) {
           params['keyword'] = searchText.value;
