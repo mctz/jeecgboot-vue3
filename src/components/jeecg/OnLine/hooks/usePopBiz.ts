@@ -8,7 +8,7 @@ import { h } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useMethods } from '/@/hooks/system/useMethods';
 import { importViewsFile, _eval } from '/@/utils';
-import {getToken} from "@/utils/auth";
+import { getToken } from '@/utils/auth';
 
 export function usePopBiz(ob, tableRef?) {
   // update-begin--author:liaozhiyang---date:20230811---for：【issues/675】子表字段Popup弹框数据不更新
@@ -100,7 +100,7 @@ export function usePopBiz(ob, tableRef?) {
     total: 0,
     // 合计逻辑 [待优化 3.0]
     showTotal: (total) => onShowTotal(total),
-    realPageSize: 10,
+    realPageSize: 20,
     realTotal: 0,
     // 是否有合计列，默认为""，在第一次获取到数据之后会设计为ture或者false
     isTotal: <string | boolean>'',
@@ -234,13 +234,19 @@ export function usePopBiz(ob, tableRef?) {
   /**
    * 加载列和数据[列表专用]
    */
-  function loadColumnsAndData() {
+  async function loadColumnsAndData() {
+    console.debug('loadColumnsAndData');
+    const path = window.location.pathname;
+    if (path.slice(1, path.lastIndexOf('/')) == 'online/cgreport') {
+      props.multi = true;
+      rowSelection.type = 'checkbox';
+    }
     // 第一次加载 置空isTotal 在这里调用确保 该方法只是进入页面后 加载一次 其余查询不走该方法
     pagination.isTotal = '';
     let url = `${configUrl.getColumnsAndData}${props.id}`;
     //缓存key
     let groupIdKey = props.groupId ? `${props.groupId}${url}` : '';
-    httpGroupRequest(() => defHttp.get({ url }, { isTransformResponse: false, successMessageMode: 'none' }), groupIdKey).then((res) => {
+    httpGroupRequest(() => defHttp.get({ url }, { isTransformResponse: false, successMessageMode: 'none' }), groupIdKey).then(async (res) => {
       if (res.success) {
         initDictOptionData(res.result.dictOptions);
         cgRpConfigId.value = props.id;
@@ -264,12 +270,24 @@ export function usePopBiz(ob, tableRef?) {
             },
           });
         }
-
         // 合并表头
         if (isGroupTitle === true) {
           currColumns = handleGroupTitle(currColumns);
         }
         columns.value = [...currColumns];
+        // 初始化列宽
+        const params = {
+          headId: path.slice(path.lastIndexOf('/') + 1),
+        };
+        const cols = await defHttp.get({ url: `/onilne/cgreportFieldList`, params });
+        if (cols.data) {
+          for (const c1 of columns.value) {
+            for (const c2 of cols.data) {
+              if (c1.dataIndex == c2.field_name && c2.field_width) c1.width = c2.field_width;
+            }
+          }
+          console.debug(cols.data, columns.value);
+        }
         initQueryInfo(res.result.data);
       } else {
         //update-begin-author:taoyan date:20220401 for: VUEN-583【vue3】JeecgBootException: sql黑名单校验不通过,请联系管理员!,前台无提示
