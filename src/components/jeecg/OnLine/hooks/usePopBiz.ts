@@ -279,14 +279,20 @@ export function usePopBiz(ob, tableRef?) {
         const params = {
           headId: path.slice(path.lastIndexOf('/') + 1),
         };
-        const cols = await defHttp.get({ url: `/onilne/cgreportFieldList`, params });
+        const cols = await defHttp.get({ url: `/onilne/tableFieldList`, params });
         if (cols.data) {
           for (const c1 of columns.value) {
             for (const c2 of cols.data) {
-              if (c1.dataIndex == c2.field_name && c2.field_width) c1.width = c2.field_width;
+              if (c1.dataIndex == c2.field_name) {
+                if (c2.field_length) c1.width = c2.field_length;
+                if (c2.text_align) c1.align = c2.text_align;
+                if (c2.attribute1) Reflect.set(c1, c2.attribute1.split(':')[0], c2.attribute1.split(':')[1]);
+                if (c2.attribute2) Reflect.set(c1, c2.attribute2.split(':')[0], c2.attribute2.split(':')[1]);
+                if (c2.attribute3) Reflect.set(c1, c2.attribute3.split(':')[0], c2.attribute3.split(':')[1]);
+              }
             }
           }
-          console.debug(cols.data, columns.value);
+          console.debug(columns.value);
         }
         initQueryInfo(res.result.data);
       } else {

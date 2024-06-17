@@ -1,5 +1,5 @@
 <template>
-  <Tooltip placement="top" v-bind="getBindProps" >
+  <Tooltip placement="top" v-bind="getBindProps">
     <template #title>
       <span>{{ t('component.table.settingColumn') }}</span>
     </template>
@@ -101,7 +101,7 @@
   import { cloneDeep, omit } from 'lodash-es';
   import Sortablejs from 'sortablejs';
   import type Sortable from 'sortablejs';
-  import { defHttp } from "@/utils/http/axios";
+  import { defHttp } from '@/utils/http/axios';
 
   interface State {
     checkAll: boolean;
@@ -140,7 +140,7 @@
       const table = useTableContext();
       const popoverVisible = ref(true);
       // update-begin--author:sunjianlei---date:20221101---for: 修复第一次进入时列表配置不能拖拽
-      nextTick(() => popoverVisible.value = false);
+      nextTick(() => (popoverVisible.value = false));
       // update-end--author:sunjianlei---date:20221101---for: 修复第一次进入时列表配置不能拖拽
       const defaultRowSelection = omit(table.getRowSelection(), 'selectedRowKeys');
       let inited = false;
@@ -171,7 +171,7 @@
             if (c1.key == c2.key && c1.width) c2.width = c1.width;
           }
         }
-        console.debug("getValues",columns2);
+        console.debug('getValues', columns2);
         return unref(table?.getBindValues) || {};
       });
 
@@ -268,13 +268,19 @@
         const params = {
           headId: path.slice(path.lastIndexOf('/') + 1),
         };
-        const res = await defHttp.get({ url: `/onilne/cgformFieldList`, params });
+        const res = await defHttp.get({ url: `/onilne/tableFieldList`, params });
         if (res.data) {
           const columns1 = plainOptions.value;
           let arr = res.data;
           for (const c1 of columns1) {
             for (const c2 of arr) {
-              if (c1.key == c2.db_field_name && c2.field_length) c1.width = c2.field_length;
+              if (c1.key == c2.field_name) {
+                if (c2.field_length) c1.width = c2.field_length;
+                if (c2.text_align) c1.align = c2.text_align;
+                if (c2.attribute1) Reflect.set(c1, c2.attribute1.split(':')[0], c2.attribute1.split(':')[1]);
+                if (c2.attribute2) Reflect.set(c1, c2.attribute2.split(':')[0], c2.attribute2.split(':')[1]);
+                if (c2.attribute3) Reflect.set(c1, c2.attribute3.split(':')[0], c2.attribute3.split(':')[1]);
+              }
             }
           }
           console.debug(columns1);
@@ -366,8 +372,8 @@
 
               plainSortOptions.value = columns;
               // update-begin--author:liaozhiyang---date:20230904---for：【QQYUN-6424】table字段列表设置不显示后，再拖拽字段顺序，原本不显示的，又显示了
-              if(state.checkedList.length != columns.length){
-                const cols = columns.map(item => item.value);
+              if (state.checkedList.length != columns.length) {
+                const cols = columns.map((item) => item.value);
                 const arr = cols.filter((cItem) => state.checkedList.find((lItem) => lItem === cItem));
                 setColumns(arr);
               } else {
