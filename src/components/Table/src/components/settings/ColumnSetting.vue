@@ -136,6 +136,7 @@
     emits: ['columns-change'],
 
     setup(props, { emit, attrs }) {
+      let tableFieldsCache = [];
       const { t } = useI18n();
       const table = useTableContext();
       const popoverVisible = ref(true);
@@ -164,14 +165,12 @@
       const { prefixCls } = useDesign('basic-column-setting');
 
       const getValues = computed(() => {
-        const columns1 = plainOptions.value;
-        const columns2 = table?.getBindValues.value.columns;
-        for (const c1 of columns1) {
-          for (const c2 of columns2) {
-            if (c1.key == c2.key && c1.width) c2.width = c1.width;
-          }
+        if (tableFieldsCache.length > 0) {
+          // 暂不清楚columns何时初始化，所有每次都重新更新属性
+          console.debug('getValues');
+          updateStyle(table?.getBindValues.value.columns, tableFieldsCache);
+          updateStyle(table?.getBindValues.value.columns, plainOptions.value);
         }
-        console.debug('getValues', columns2);
         return unref(table?.getBindValues) || {};
       });
 
@@ -245,7 +244,6 @@
           plainSortOptions.value = columns;
           cachePlainOptions.value = columns;
           state.defaultCheckList = checkList;
-          loadCgformFieldList();
         } else {
           // const fixedColumns = columns.filter((item) =>
           //   Reflect.has(item, 'fixed')
@@ -258,35 +256,38 @@
             }
           });
         }
+        loadCgformFieldList(plainOptions.value);
         state.isInit = true;
         state.checkedList = checkList;
       }
 
-      async function loadCgformFieldList() {
-        console.debug('loadCgformFieldList()');
+      async function loadCgformFieldList(plainOptions: any) {
+        console.debug('loadCgformFieldList');
         const path = window.location.pathname;
         const params = {
           headId: path.slice(path.lastIndexOf('/') + 1),
         };
         const res = await defHttp.get({ url: `/onilne/tableFieldList`, params });
         if (res.data) {
-          const columns1 = plainOptions.value;
-          let arr = res.data;
-          for (const c1 of columns1) {
-            for (const c2 of arr) {
-              if (c1.key == c2.field_name) {
-                if (c2.field_length) c1.width = c2.field_length;
-                if (c2.text_align) c1.align = c2.text_align;
-                if (c2.attribute1) Reflect.set(c1, c2.attribute1.split(':')[0], c2.attribute1.split(':')[1]);
-                if (c2.attribute2) Reflect.set(c1, c2.attribute2.split(':')[0], c2.attribute2.split(':')[1]);
-                if (c2.attribute3) Reflect.set(c1, c2.attribute3.split(':')[0], c2.attribute3.split(':')[1]);
-              }
-            }
-          }
-          console.debug(columns1);
+          tableFieldsCache = res.data;
+          updateStyle(plainOptions, res.data);
         }
       }
 
+      function updateStyle(plainOptions: any, tableFields: any) {
+        for (const c1 of plainOptions) {
+          for (const c2 of tableFields) {
+            if (c1.key == c2.key) {
+              if (c2.width) Reflect.set(c1, 'width', c2.width);
+              if (c2.align) Reflect.set(c1, 'align', c2.align);
+              if (c2.attribute1) Reflect.set(c1, c2.attribute1.split(':')[0], c2.attribute1.split(':')[1]);
+              if (c2.attribute2) Reflect.set(c1, c2.attribute2.split(':')[0], c2.attribute2.split(':')[1]);
+              if (c2.attribute3) Reflect.set(c1, c2.attribute3.split(':')[0], c2.attribute3.split(':')[1]);
+            }
+          }
+        }
+        console.debug('updateStyle', plainOptions, tableFields);
+      }
       // checkAll change
       function onCheckAllChange(e: CheckboxChangeEvent) {
         const checkList = plainOptions.value.map((item) => item.value);
@@ -336,7 +337,7 @@
         if (sortableOrder.value) {
           sortable.sort(sortableOrder.value);
         }
-        loadCgformFieldList();
+        loadCgformFieldList(plainOptions.value);
         resetSetting();
       }
 
@@ -405,6 +406,7 @@
       }
 
       function handleColumnFixed(item: BasicColumn, fixed?: 'left' | 'right') {
+        console.debug('handleColumnFixed');
         if (!state.checkedList.includes(item.dataIndex as string)) return;
 
         const columns = getColumns() as BasicColumn[];
@@ -422,6 +424,7 @@
       }
 
       function setColumns(columns: BasicColumn[] | string[]) {
+        console.debug('setColumns');
         table.setColumns(columns);
         const data: ColumnChangeParam[] = unref(plainSortOptions).map((col) => {
           const visible =

@@ -39,8 +39,7 @@ export function useColumnsCache(opt, setColumns, handleColumnFixed) {
       return;
     }
     isInit = true;
-    let columnCache = $ls.get(cacheKey.value);
-    console.debug("columnCache",columnCache);
+    const columnCache = $ls.get(cacheKey.value);
     if (columnCache && columnCache.checkedList) {
       const { checkedList, sortedList, sortableOrder, checkIndex } = columnCache;
       await nextTick();
@@ -63,6 +62,7 @@ export function useColumnsCache(opt, setColumns, handleColumnFixed) {
       // 设置固定列
       setColumnFixed(columnCache);
     }
+    console.debug('columnCache', table?.getBindValues.value.columns);
   }
 
   /** 设置被固定的列 */
@@ -98,6 +98,7 @@ export function useColumnsCache(opt, setColumns, handleColumnFixed) {
 
   /** 保存列配置 */
   function saveSetting() {
+    console.debug('saveSetting');
     const { checkedList } = opt.state;
     const sortedList = unref(opt.plainSortOptions).map((item) => item.value);
     const plainOptions = opt.plainOptions;
@@ -124,7 +125,6 @@ export function useColumnsCache(opt, setColumns, handleColumnFixed) {
     $message.success('保存成功');
     // 保存之后直接关闭
     opt.popoverVisible.value = false;
-    console.debug("saveSetting",table?.getBindValues.value.columns);
   }
 
   /** 重置（删除）列配置 */
